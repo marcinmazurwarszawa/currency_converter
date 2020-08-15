@@ -1,5 +1,6 @@
 from flask import request, jsonify
 
+from exceptions import *
 from settings import app, db, RETURN_PRECISION
 from functions import convert_to_another_currency
 

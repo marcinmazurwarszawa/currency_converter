@@ -2,6 +2,7 @@ from decimal import *
 
 import requests
 
+from exceptions import CustomException
 from settings import NBP_BASE_CURRENCY_URL
 from repositories import find_actual_exchange_rate_in_db, save_actual_exchange_rate
 
@@ -11,10 +12,10 @@ def download_exchange_rate(curr_code: str) -> Decimal:
     try:
         resp = requests.get(url)
         if resp.status_code == 404:
-            raise Exception("Wrong currency code")
+            raise CustomException("Wrong currency code")
         rate = resp.json()['rates'][0]['mid']
-    except ValueError:
-        raise Exception("Problem with external service")
+    except KeyError:
+        raise CustomException("Problem with external service", 503)
     return Decimal(str(rate))
 
 
@@ -33,7 +34,7 @@ def convert_to_another_currency(amount: str, curr_1: str, curr_2: str) -> Decima
     try:
         amount = Decimal(amount)
     except TypeError:
-        raise Exception('Wrong amount to convert')
+        raise CustomException('Wrong amount to convert')
     curr_1_to_pln = get_exchange_rate(curr=curr_1)
     pln_to_curr_2 = get_exchange_rate(curr=curr_2)
     return amount * curr_1_to_pln * pln_to_curr_2
