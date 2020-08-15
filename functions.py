@@ -3,6 +3,7 @@ from decimal import *
 import requests
 
 from settings import NBP_BASE_CURRENCY_URL
+from repositories import find_actual_exchange_rate_in_db, save_actual_exchange_rate
 
 
 def download_exchange_rate(curr_code: str) -> Decimal:
@@ -14,14 +15,18 @@ def download_exchange_rate(curr_code: str) -> Decimal:
         rate = resp.json()['rates'][0]['mid']
     except ValueError:
         raise Exception("Problem with external service")
-    return Decimal(rate)
+    return Decimal(str(rate))
 
 
 def get_exchange_rate(curr: str) -> Decimal:
-    if curr.upper() == 'PLN':
+    curr = curr.upper()
+    if curr == 'PLN':
         return Decimal(1)
-    exchange_rate = download_exchange_rate(curr_code=curr)
-    return exchange_rate
+    rate = find_actual_exchange_rate_in_db(curr=curr)
+    if rate is None:
+        rate = download_exchange_rate(curr_code=curr)
+        save_actual_exchange_rate(curr=curr, rate=rate)
+    return rate
 
 
 def convert_to_another_currency(amount: str, curr_1: str, curr_2: str) -> Decimal:

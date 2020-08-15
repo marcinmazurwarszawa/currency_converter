@@ -1,6 +1,6 @@
 from flask import request, jsonify
 
-from settings import app, RETURN_PRECISION
+from settings import app, db, RETURN_PRECISION
 from functions import convert_to_another_currency
 
 
@@ -21,4 +21,5 @@ def convert():
 
 
 if __name__ == '__main__':
+    db.create_all()
     app.run(port=5000, debug=True)
