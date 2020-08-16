@@ -9,3 +9,6 @@ class ExchangeRate(db.Model):
     currency = Column(String(3), nullable=False, primary_key=True)
     day = Column(Date, nullable=False, primary_key=True)
     rate = Column(DECIMAL, nullable=False)
+
+
+db.create_all()

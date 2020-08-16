@@ -1,7 +1,7 @@
 from flask import request
 
 from exceptions import *
-from settings import app, db
+from settings import app
 from functions import convert_to_another_currency
 
 
@@ -21,5 +21,4 @@ def convert():
 
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(host="0.0.0.0")
