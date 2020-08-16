@@ -1,7 +1,7 @@
-from flask import request, jsonify
+from flask import request
 
 from exceptions import *
-from settings import app, db, RETURN_PRECISION
+from settings import app, db
 from functions import convert_to_another_currency
 
 
@@ -11,7 +11,6 @@ def convert():
     curr_2 = request.args.get('currency2')
     amount = request.args.get('amount')
     converted = convert_to_another_currency(amount=amount, curr_1=curr_1, curr_2=curr_2)
-    converted = round(float(converted), RETURN_PRECISION)
     payload = {
         'currency1': curr_1,
         'currency2': curr_2,
@@ -23,4 +22,4 @@ def convert():
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(port=5000, debug=True)
+    app.run(host="0.0.0.0")

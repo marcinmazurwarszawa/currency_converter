@@ -3,7 +3,7 @@ from decimal import *
 import requests
 
 from exceptions import CustomException
-from settings import NBP_BASE_CURRENCY_URL
+from settings import NBP_BASE_CURRENCY_URL, RETURN_PRECISION
 from repositories import find_actual_exchange_rate_in_db, save_actual_exchange_rate
 
 
@@ -30,11 +30,12 @@ def get_exchange_rate(curr: str) -> Decimal:
     return rate
 
 
-def convert_to_another_currency(amount: str, curr_1: str, curr_2: str) -> Decimal:
+def convert_to_another_currency(amount: str, curr_1: str, curr_2: str) -> float:
     try:
         amount = Decimal(amount)
     except TypeError:
         raise CustomException('Wrong amount to convert')
     curr_1_to_pln = get_exchange_rate(curr=curr_1)
     pln_to_curr_2 = get_exchange_rate(curr=curr_2)
-    return amount * curr_1_to_pln * pln_to_curr_2
+    converted = amount * curr_1_to_pln / pln_to_curr_2
+    return round(float(converted), RETURN_PRECISION)
