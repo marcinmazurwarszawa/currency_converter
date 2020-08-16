@@ -33,7 +33,7 @@ def get_exchange_rate(curr: str) -> Decimal:
 def convert_to_another_currency(amount: str, curr_1: str, curr_2: str) -> float:
     try:
         amount = Decimal(amount)
-    except TypeError:
+    except DecimalException:
         raise CustomException('Wrong amount to convert')
     curr_1_to_pln = get_exchange_rate(curr=curr_1)
     pln_to_curr_2 = get_exchange_rate(curr=curr_2)
