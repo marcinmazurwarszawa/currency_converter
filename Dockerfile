@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.8
 MAINTAINER Marcin Mazur
 
 ENV PYTHONUNBUFFERED 1
