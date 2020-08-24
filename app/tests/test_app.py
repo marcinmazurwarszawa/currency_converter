@@ -1,60 +1,33 @@
-from unittest import TestCase
+import pytest
 
 from app import app
 
 
-class AppTest(TestCase):
+@pytest.mark.parametrize("params, expected_status_code", [
+    ({'currency1': 'PLN', 'currency2': 'EUR', 'amount': '20'}, 200),
+    ({}, 400),
+    ({'currency1': 'PLN', 'currency2': 'EUR', 'amount': 'aaa'}, 400),
+    ({'currency1': 'PLN', 'currency2': 'EUR'}, 400),
+    ({'currency1': 'bbb', 'currency2': 'EUR', 'amount': '30'}, 400),
+    ({'currency2': 'EUR', 'amount': '30'}, 400),
+    ({'currency1': 'PLN', 'currency2': '77', 'amount': '30'}, 400),
+    ({'currency1': 'PLN', 'amount': '30'}, 400),
+])
+def test_convert_response_status_code(params, expected_status_code):
+    client = app.test_client()
+    response = client.get('/convert', query_string=params)
+    assert response.status_code == expected_status_code
+    assert response.content_type == 'application/json'
 
-    def setUp(self):
-        self.app = app.test_client()
 
-    def test_convert_success_content(self):
-        params = {'currency1': 'PLN', 'currency2': 'EUR', 'amount': '20'}
-        response = self.app.get('/convert', query_string=params)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content_type, 'application/json')
-
-    def test_convert_success_data(self):
-        params = {'currency1': 'PLN', 'currency2': 'EUR', 'amount': '20'}
-        response = self.app.get('/convert', query_string=params)
-        json_data = response.get_json()
-        self.assertEqual(len(json_data), 4)
-        self.assertEqual(type(json_data), dict)
-        self.assertEqual(type(json_data['currency1']), str)
-        self.assertEqual(type(json_data['currency2']), str)
-        self.assertEqual(type(json_data['amount']), str)
-        self.assertEqual(type(json_data['converted']), float)
-
-    def test_convert_no_parameters(self):
-        response = self.app.get('/convert')
-        self.assertEqual(response.status_code, 400)
-
-    def test_convert_wrong_amount(self):
-        params = {'currency1': 'PLN', 'currency2': 'EUR', 'amount': 'aaa'}
-        response = self.app.get('/convert', query_string=params)
-        self.assertEqual(response.status_code, 400)
-
-    def test_convert_no_amount(self):
-        params = {'currency1': 'PLN', 'currency2': 'EUR'}
-        response = self.app.get('/convert', query_string=params)
-        self.assertEqual(response.status_code, 400)
-
-    def test_convert_wrong_currency1(self):
-        params = {'currency1': 'bbb', 'currency2': 'EUR', 'amount': '30'}
-        response = self.app.get('/convert', query_string=params)
-        self.assertEqual(response.status_code, 400)
-
-    def test_convert_no_currency1(self):
-        params = {'currency2': 'EUR', 'amount': '30'}
-        response = self.app.get('/convert', query_string=params)
-        self.assertEqual(response.status_code, 400)
-
-    def test_convert_wrong_currency2(self):
-        params = {'currency1': 'PLN', 'currency2': '77', 'amount': '30'}
-        response = self.app.get('/convert', query_string=params)
-        self.assertEqual(response.status_code, 400)
-
-    def test_convert_no_currency2(self):
-        params = {'currency1': 'PLN', 'amount': '30'}
-        response = self.app.get('/convert', query_string=params)
-        self.assertEqual(response.status_code, 400)
+def test_convert_success_data():
+    client = app.test_client()
+    params = {'currency1': 'PLN', 'currency2': 'EUR', 'amount': '20'}
+    response = client.get('/convert', query_string=params)
+    json_data = response.get_json()
+    assert len(json_data) == 4
+    assert type(json_data) == dict
+    assert type(json_data['currency1']) == str
+    assert type(json_data['currency2']) == str
+    assert type(json_data['amount']) == str
+    assert type(json_data['converted']) == float
