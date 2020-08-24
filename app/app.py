@@ -1,8 +1,8 @@
-from flask import request
+from flask import request, jsonify
 
-from exceptions import *
+from exceptions import CustomException
 from settings import app
-from functions import convert_to_another_currency
+from services import CurrencyConverterService
 
 
 @app.route('/convert', methods=['GET'])
@@ -10,12 +10,15 @@ def convert():
     curr_1 = request.args.get('currency1')
     curr_2 = request.args.get('currency2')
     amount = request.args.get('amount')
-    converted = convert_to_another_currency(amount=amount, curr_1=curr_1, curr_2=curr_2)
+    if curr_1 is None or curr_2 is None:
+        raise CustomException('Both currency1 and currency2 are needed')
+    converter = CurrencyConverterService()
+    converted = converter.convert(amount=amount, curr_1=curr_1, curr_2=curr_2)
     payload = {
         'currency1': curr_1,
         'currency2': curr_2,
         'amount': amount,
-        'value2': converted,
+        'converted': converted,
     }
     return jsonify(payload)
 

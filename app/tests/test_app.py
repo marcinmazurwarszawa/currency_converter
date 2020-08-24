@@ -23,7 +23,7 @@ class AppTest(TestCase):
         self.assertEqual(type(json_data['currency1']), str)
         self.assertEqual(type(json_data['currency2']), str)
         self.assertEqual(type(json_data['amount']), str)
-        self.assertEqual(type(json_data['value2']), float)
+        self.assertEqual(type(json_data['converted']), float)
 
     def test_convert_no_parameters(self):
         response = self.app.get('/convert')
@@ -34,12 +34,27 @@ class AppTest(TestCase):
         response = self.app.get('/convert', query_string=params)
         self.assertEqual(response.status_code, 400)
 
+    def test_convert_no_amount(self):
+        params = {'currency1': 'PLN', 'currency2': 'EUR'}
+        response = self.app.get('/convert', query_string=params)
+        self.assertEqual(response.status_code, 400)
+
     def test_convert_wrong_currency1(self):
         params = {'currency1': 'bbb', 'currency2': 'EUR', 'amount': '30'}
         response = self.app.get('/convert', query_string=params)
         self.assertEqual(response.status_code, 400)
 
+    def test_convert_no_currency1(self):
+        params = {'currency2': 'EUR', 'amount': '30'}
+        response = self.app.get('/convert', query_string=params)
+        self.assertEqual(response.status_code, 400)
+
     def test_convert_wrong_currency2(self):
         params = {'currency1': 'PLN', 'currency2': '77', 'amount': '30'}
+        response = self.app.get('/convert', query_string=params)
+        self.assertEqual(response.status_code, 400)
+
+    def test_convert_no_currency2(self):
+        params = {'currency1': 'PLN', 'amount': '30'}
         response = self.app.get('/convert', query_string=params)
         self.assertEqual(response.status_code, 400)

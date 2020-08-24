@@ -42,4 +42,4 @@ Przykładowy request:
 - /convert?currency1=EUR&currency2=USD&amount=55
 
 Przykładowa odpowiedź w formacie JSON:
-- {"amount":"55","currency1":"EUR","currency2":"USD","value2":64.9889}
+- {"amount":"55","currency1":"EUR","currency2":"USD","converted":64.9889}
